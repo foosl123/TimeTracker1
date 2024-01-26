@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -22,7 +23,7 @@ namespace TimeTracker1.Tests.IntegrationTests
 
         public UsersApiTests()
         {
-            const string issuer = "http://localhost:44383";
+            const string issuer = "http://localhost:44374";
             const string key = "some-long-secret-key";
 
             // Must initialize and open Sqlite connection in order to keep in-memory database tables
@@ -35,9 +36,9 @@ namespace TimeTracker1.Tests.IntegrationTests
                 .UseSetting("Tokens:Issuer", issuer)
                 .UseSetting("Tokens:Key", key)
                 .UseStartup<Startup>()
-                .UseUrls("https://localhost:44383"))
+                .UseUrls("https://localhost:44374"))
             {
-                BaseAddress = new Uri("https://localhost:44383")
+                BaseAddress = new Uri("https://localhost:44374")
             };
 
             // Force creation of InMemory database
