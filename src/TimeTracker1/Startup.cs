@@ -1,5 +1,6 @@
 using System;
 using FluentValidation.AspNetCore;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +36,10 @@ namespace TimeTracker1
 
             services.AddControllers().AddFluentValidation(
                 fv => fv.RegisterValidatorsFromAssemblyContaining<UserInputModelValidator>());
+            services.AddVersioning();
+            
+            services.AddOpenApi();
+            
             services.AddApiVersioning(options =>
             {
                 options.ReportApiVersions = true;
@@ -42,7 +47,9 @@ namespace TimeTracker1
                 options.DefaultApiVersion = new ApiVersion(2, 0);
             });
             services.AddJwtBearerAuthentication(Configuration);
-            services.AddOpenApi();
+            services.AddHealthChecks()
+                .AddSqlite(Configuration.GetConnectionString("DefaultConnection"));
+            services.AddHealthChecksUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,7 +71,7 @@ namespace TimeTracker1
 
             // Inject our custom error handling middleware into ASP.NET Core pipeline
             app.UseMiddleware<ErrorHandlingMiddleware>();
-
+            app.UseMiddleware<LimitingMiddleware>();
             app.UseRouting();
 
             app.UseAuthentication();
@@ -80,10 +87,19 @@ namespace TimeTracker1
                     .AllowAnyHeader());
 
 
+            // Modify app.UseEndpoints, and add UI middleware before it:
+            app.UseHealthChecksUI();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
             });
+
         }
     }
 }
