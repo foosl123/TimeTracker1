@@ -9,7 +9,7 @@ using TimeTracker1.Data;
 using TimeTracker1.Domain;
 using TimeTracker1.Models;
 
-namespace TimeTracker.Controllers
+namespace TimeTracker1.Controllers
 {
     /// <summary>
     /// Clients endpoint of TimeTracker API.

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TimeTracker1.Data;
+using TimeTracker1.Extensions;
 using TimeTracker1.Models.Validation;
 
 namespace TimeTracker1
@@ -41,6 +42,7 @@ namespace TimeTracker1
                 options.DefaultApiVersion = new ApiVersion(2, 0);
             });
             services.AddJwtBearerAuthentication(Configuration);
+            services.AddOpenApi();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,7 +69,8 @@ namespace TimeTracker1
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
             // NOTE: this is just for demo purpose! Usually, you should limit access to a specific origin
             // More info: https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-3.0
             app.UseCors(
